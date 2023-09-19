@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -10,6 +11,8 @@ namespace OTM.DevLOG;
 
 public class Program
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
     public async static Task<int> Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()

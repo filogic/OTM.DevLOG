@@ -28,6 +28,7 @@ using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.VirtualFileSystem;
+using Microsoft.Extensions.Hosting.Internal;
 
 namespace OTM.DevLOG;
 
@@ -35,7 +36,7 @@ namespace OTM.DevLOG;
     typeof(DevLOGHttpApiModule),
     typeof(AbpAutofacModule),
     typeof(AbpCachingStackExchangeRedisModule),
-    typeof(AbpDistributedLockingModule),
+    //typeof(AbpDistributedLockingModule),
     typeof(AbpAspNetCoreMvcUiMultiTenancyModule),
     typeof(DevLOGApplicationModule),
     typeof(DevLOGEntityFrameworkCoreModule),
@@ -54,7 +55,7 @@ public class DevLOGHttpApiHostModule : AbpModule
         ConfigureCache(configuration);
         ConfigureVirtualFileSystem(context);
         ConfigureDataProtection(context, configuration, hostingEnvironment);
-        ConfigureDistributedLocking(context, configuration);
+        //ConfigureDistributedLocking(context, configuration);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
     }
@@ -138,7 +139,7 @@ public class DevLOGHttpApiHostModule : AbpModule
 
     private void ConfigureDistributedLocking(
         ServiceConfigurationContext context,
-        IConfiguration configuration)
+        IConfiguration configuration )
     {
         context.Services.AddSingleton<IDistributedLockProvider>(sp =>
         {

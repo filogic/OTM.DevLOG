@@ -1,6 +1,6 @@
 {
   "iisSettings": {
-    "windowsAuthentication": false, 
+    "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
       "applicationUrl": "https://localhost:44336",
@@ -20,7 +20,8 @@
       "launchBrowser": true,
       "applicationUrl": "https://localhost:44336",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "GOOGLE_APPLICATION_CREDENTIALS": "/Users/marinus.brink/Projects/OTM.DevLOG/aspnet-core/src/OTM.DevLOG.HttpApi.Host/Properties/googleCredentials.json"
       }
     }
   }
