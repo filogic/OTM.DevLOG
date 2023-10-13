@@ -29,8 +29,12 @@
   <ItemGroup>
     <Folder Include="ApplicationServices\" />
     <Folder Include="Extensions\" />
+    <Folder Include="BackgroundWorkers\" />
+    <Folder Include="BackgroundWorkers\Dto\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Extensions\" />
+    <None Remove="BackgroundWorkers\" />
+    <None Remove="BackgroundWorkers\Dto\" />
   </ItemGroup>
 </Project>

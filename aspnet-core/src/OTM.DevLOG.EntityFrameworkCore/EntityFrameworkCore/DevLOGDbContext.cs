@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OTM.DevLOG.Data;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
@@ -51,6 +53,10 @@ public class DevLOGDbContext :
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
 
+    // Business entities
+    public DbSet<NdwOpenDataMeasurementSiteReference> NdwOpenDataMeasurementSiteReferences { get; set; }
+
+    
     #endregion
 
     public DevLOGDbContext(DbContextOptions<DevLOGDbContext> options)
@@ -75,6 +81,11 @@ public class DevLOGDbContext :
         builder.ConfigureTenantManagement();
 
         /* Configure your own tables/entities inside here */
+        builder.Entity<NdwOpenDataMeasurementSiteReference>(entity =>
+        {
+            entity.ToTable("NdwOpenDataMeasurementSiteReference", DevLOGConsts.DbSchema);
+            entity.ConfigureByConvention(); //auto configure for the base class props
+        });
 
         //builder.Entity<YourEntity>(b =>
         //{

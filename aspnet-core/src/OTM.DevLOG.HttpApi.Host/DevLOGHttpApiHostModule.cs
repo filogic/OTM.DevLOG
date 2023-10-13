@@ -29,6 +29,9 @@ using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.VirtualFileSystem;
 using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.AspNetCore.Http.Features;
+using Google.Protobuf.WellKnownTypes;
+using Volo.Abp.BackgroundWorkers;
 
 namespace OTM.DevLOG;
 
@@ -43,12 +46,37 @@ namespace OTM.DevLOG;
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule)
 )]
-public class DevLOGHttpApiHostModule : AbpModule
+[DependsOn(typeof(AbpBackgroundWorkersModule))]
+    public class DevLOGHttpApiHostModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
+        if (hostingEnvironment.IsDevelopment())
+            Console.WriteLine("Running in development environment");
+        else
+            Console.WriteLine("Running in non-development environment");
+
+
+        Console.WriteLine("Sql configuration: " + configuration["ConnectionStrings:Default"]);
+        Console.WriteLine("Redis configuration: " + configuration["Redis:Configuration"]);
+
+        // Check whether the environment variable exists.
+        var googleApplicationCredentials = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
+        // If necessary, create it.
+        if (googleApplicationCredentials == null)
+        {
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "devlog-prod-gcp.json");
+
+            // Now retrieve it.
+            googleApplicationCredentials = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
+        }
+        // Display the value.
+        Console.WriteLine($"GOOGLE_APPLICATION_CREDENTIALS: {googleApplicationCredentials}");
+
+
+
 
         ConfigureConventionalControllers();
         ConfigureAuthentication(context, configuration);
@@ -110,6 +138,15 @@ public class DevLOGHttpApiHostModule : AbpModule
 
     private static void ConfigureSwaggerServices(ServiceConfigurationContext context, IConfiguration configuration)
     {
+        context.Services.AddSwaggerGen(
+            options =>
+            {
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "DevLOG API", Version = "v1" });
+            options.DocInclusionPredicate((docName, description) => true);
+            options.CustomSchemaIds(type => type.FullName);
+            });
+
+        /*
         context.Services.AddAbpSwaggerGenWithOAuth(
             configuration["AuthServer:Authority"],
             new Dictionary<string, string>
@@ -122,6 +159,7 @@ public class DevLOGHttpApiHostModule : AbpModule
                 options.DocInclusionPredicate((docName, description) => true);
                 options.CustomSchemaIds(type => type.FullName);
             });
+        */
     }
 
     private void ConfigureDataProtection(
@@ -130,11 +168,11 @@ public class DevLOGHttpApiHostModule : AbpModule
         IWebHostEnvironment hostingEnvironment)
     {
         var dataProtectionBuilder = context.Services.AddDataProtection().SetApplicationName("DevLOG");
-        if (!hostingEnvironment.IsDevelopment())
-        {
-            var redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
-            dataProtectionBuilder.PersistKeysToStackExchangeRedis(redis, "DevLOG-Protection-Keys");
-        }
+       // if (!hostingEnvironment.IsDevelopment())
+       // {
+         //   var redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]);
+         //   dataProtectionBuilder.PersistKeysToStackExchangeRedis(redis, "DevLOG-Protection-Keys");
+        //}
     }
 
     private void ConfigureDistributedLocking(
